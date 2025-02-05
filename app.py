@@ -16,7 +16,7 @@ def allow_self_signed_https(allowed: bool):
     if allowed and not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None):
         ssl._create_default_https_context = ssl._create_unverified_context
 
-# Enable bypass for self-signed certificates (if needed)
+# Enable bypass for self-signed certificates if necessary
 allow_self_signed_https(True)
 
 # Retrieve environment variables
@@ -35,11 +35,12 @@ if not endpoint:
 def call_api(input_url: str) -> dict:
     """
     Calls the API endpoint with the provided input URL.
-    The request sends a JSON payload with 'chat_history' and 'URL' keys.
+    The request sends a JSON payload with 'chat_history' as an empty list and 'URL' with the user input.
     """
-    # Prepare the payload with the required keys.
+    # Prepare the payload with the required keys:
+    # - Use an empty list for chat_history instead of an empty string.
     data = {
-        "chat_history": "",  # Assuming no chat history; adjust as needed.
+        "chat_history": [],
         "URL": input_url
     }
     # Convert the payload to JSON and encode it to bytes
@@ -57,7 +58,7 @@ def call_api(input_url: str) -> dict:
     try:
         with urllib.request.urlopen(req) as response:
             result = response.read()
-            # Decode the result assuming it's a JSON response; adjust if needed
+            # Decode the result assuming it's a JSON response
             return json.loads(result.decode('utf-8'))
     except urllib.error.HTTPError as error:
         error_message = f"The request failed with status code: {error.code}\n"
@@ -69,7 +70,7 @@ def call_api(input_url: str) -> dict:
 
 # --- Streamlit App UI ---
 
-st.title("Simple API Caller")
+st.title("Article JSON-LD Generator")
 
 # Create a text input box for the URL
 user_url = st.text_input("Enter the URL to process:")
