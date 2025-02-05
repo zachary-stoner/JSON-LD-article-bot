@@ -1,35 +1,25 @@
 import streamlit as st
-import os
 import json
 import urllib.request
 import urllib.error
 import ssl
-from dotenv import load_dotenv
-
-# Load environment variables from the .env file
-load_dotenv()
 
 def allow_self_signed_https(allowed: bool):
     """
     Bypass server certificate verification if using self-signed certificates.
     """
-    if allowed and not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None):
+    if allowed and getattr(ssl, '_create_unverified_context', None):
         ssl._create_default_https_context = ssl._create_unverified_context
 
 # Enable bypass for self-signed certificates if necessary
 allow_self_signed_https(True)
 
-# Retrieve environment variables
-api_key = os.getenv("API_KEY")
-endpoint = os.getenv("ENDPOINT")
-
-# Validate that the API key and endpoint are available
-if not api_key:
-    st.error("API_KEY is not set. Please update your .env file.")
-    st.stop()
-
-if not endpoint:
-    st.error("ENDPOINT is not set. Please update your .env file.")
+# Retrieve secrets from Streamlit's built-in secrets manager
+try:
+    api_key = st.secrets["api"]["API_KEY"]
+    endpoint = st.secrets["api"]["ENDPOINT"]
+except KeyError:
+    st.error("API_KEY or ENDPOINT is missing from the secrets file. Please update your .streamlit/secrets.toml.")
     st.stop()
 
 def call_api(input_url: str) -> dict:
@@ -73,7 +63,7 @@ def call_api(input_url: str) -> dict:
 st.title("Article JSON-LD Generator")
 
 # Create a text input box for the URL
-user_url = st.text_input("Enter the URL to process: Please note this is only intended for article ")
+user_url = st.text_input("Enter the URL to process:")
 
 # Create a submit button
 if st.button("Submit"):
