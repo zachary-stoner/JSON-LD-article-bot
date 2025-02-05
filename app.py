@@ -73,12 +73,12 @@ def call_api(input_url: str) -> dict:
 st.title("Article JSON-LD Generator")
 
 # Create a text input box for the URL
-user_url = st.text_input("Enter the URL to process:")
+user_url = st.text_input("Enter the URL to process: Please note this is only intended for article ")
 
 # Create a submit button
 if st.button("Submit"):
     if user_url:
-        st.info("Sending data to API...")
+        st.info("Scraping URL and generating JSON-LD...")
         response = call_api(user_url)
         st.write("Response from API:")
         st.json(response)
