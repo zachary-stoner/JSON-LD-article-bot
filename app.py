@@ -25,13 +25,13 @@ except KeyError:
 def call_api(input_url: str) -> dict:
     """
     Calls the API endpoint with the provided input URL.
-    The request sends a JSON payload with 'chat_history' as an empty list and 'URL' with the user input.
+    The request sends a JSON payload with 'chat_history' as an empty list and 'input_url' with the user input.
     """
     # Prepare the payload with the required keys:
     # - Use an empty list for chat_history instead of an empty string.
     data = {
         "chat_history": [],
-        "URL": input_url
+        "input_url": input_url
     }
     # Convert the payload to JSON and encode it to bytes
     body = str.encode(json.dumps(data))
