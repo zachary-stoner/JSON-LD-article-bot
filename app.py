@@ -62,15 +62,33 @@ def call_api(input_url: str) -> dict:
 
 st.title("Article JSON-LD Generator")
 
+# Initialize session state if needed
+if 'processing' not in st.session_state:
+    st.session_state.processing = False
+if 'response' not in st.session_state:
+    st.session_state.response = None
+
 # Create a text input box for the URL
 user_url = st.text_input("Enter the Dark Horse article URL to process:")
 
 # Create a submit button
 if st.button("Submit"):
     if user_url:
-        st.info("Scraping URL and generating JSON-LD...")
-        response = call_api(user_url)
-        st.write("Response from API:")
-        st.json(response)
+        st.session_state.processing = True
+        st.session_state.response = None
+        st.rerun()
     else:
         st.warning("Please enter a URL before submitting.")
+
+# Show processing message only during processing
+if st.session_state.processing and st.session_state.response is None:
+    info_placeholder = st.info("Scraping URL and generating JSON-LD...")
+    response = call_api(user_url)
+    st.session_state.response = response
+    st.session_state.processing = False
+    st.rerun()
+
+# Display the response if available
+if st.session_state.response is not None:
+    st.write("Response from API:")
+    st.json(st.session_state.response)
